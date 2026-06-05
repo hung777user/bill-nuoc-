@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POS Nước Ép Ultimate</title>
+<meta name="theme-color" content="#22c55e">
+<style>
+body{font-family:Arial;padding:12px;background:#f4f4f4}
+textarea,input,select,button{width:100%;padding:10px;margin:6px 0;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:1fr 110px 90px;gap:6px}
+.card{background:#fff;padding:10px;border-radius:10px;margin:8px 0}
+pre{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h2>🍹 POS Nước Ép Ultimate</h2>
+
+<div class="card">
+<h3>Chọn món nhanh</h3>
+<select id="mon"></select>
+<select id="size">
+<option>200</option>
+<option>300</option>
+<option>500</option>
+</select>
+<input id="qty" type="number" value="1" min="1">
+<button onclick="themMon()">➕ Thêm món</button>
+</div>
+
+<div class="card">
+<h3>Hoặc nhập thủ công</h3>
+<textarea id="order" rows="8" placeholder="2 tao 300"></textarea>
+<button onclick="tinhTien()">🧾 Tính tiền</button>
+<input id="khachdua" type="number" placeholder="Tiền khách đưa (k)">
+</div>
+
+<div class="card">
+<h3>Hóa đơn</h3>
+<pre id="bill"></pre>
+</div>
+
+<div class="card">
+<h3>📈 Doanh thu hôm nay</h3>
+<div id="revenue"></div>
+<button onclick="resetRevenue()">Reset doanh thu</button>
+</div>
+
+<script>
+const menu={
+"tao":{200:30,300:45,500:65},
+"bo":{200:30,300:45,500:65},
+"xoai":{200:30,300:45,500:65},
+"chanh day":{200:20,300:30,500:40},
+"can tay tao":{200:35,300:50,500:75},
+"can tay":{200:40,300:55,500:90},
+"oi":{200:25,300:35,500:55},
+"thom":{200:25,300:35,500:55},
+"dua hau":{200:25,300:35,500:50},
+"buoi hong":{200:40,300:55,500:90},
+"kale":{200:45,300:60,500:95},
+"rau ma":{200:20,300:30,500:45}
+};
+
+const sel=document.getElementById("mon");
+Object.keys(menu).sort().forEach(m=>{
+ let o=document.createElement("option");
+ o.textContent=m;
+ o.value=m;
+ sel.appendChild(o);
+});
+
+function themMon(){
+ let q=document.getElementById("qty").value;
+ let m=document.getElementById("mon").value;
+ let s=document.getElementById("size").value;
+ document.getElementById("order").value += `${q} ${m} ${s}\n`;
+}
+
+function tinhTien(){
+ let lines=document.getElementById("order").value.trim().split("\n");
+ let tong=0;
+ let out="";
+ for(let line of lines){
+  if(!line.trim()) continue;
+  let a=line.trim().split(/\s+/);
+  let qty=parseInt(a[0]);
+  let size=parseInt(a[a.length-1]);
+  let ten=a.slice(1,-1).join(" ");
+  if(menu[ten]&&menu[ten][size]){
+    let tt=menu[ten][size]*qty;
+    tong+=tt;
+    out+=`${qty} x ${ten} (${size}ml) = ${tt}k\n`;
+  }
+ }
+ out+="\nTỔNG: "+tong+"k";
+ let kd=Number(document.getElementById("khachdua").value||0);
+ if(kd>0) out+="\nKHÁCH ĐƯA: "+kd+"k\nTIỀN THỐI: "+(kd-tong)+"k";
+ document.getElementById("bill").textContent=out;
+
+ let today=new Date().toISOString().slice(0,10);
+ let data=JSON.parse(localStorage.getItem("revenue")||"{}");
+ data[today]=(data[today]||0)+tong;
+ localStorage.setItem("revenue",JSON.stringify(data));
+ loadRevenue();
+}
+
+function loadRevenue(){
+ let today=new Date().toISOString().slice(0,10);
+ let data=JSON.parse(localStorage.getItem("revenue")||"{}");
+ document.getElementById("revenue").innerHTML=
+ "<b>Ngày:</b> "+today+"<br><b>Doanh thu:</b> "+(data[today]||0)+"k";
+}
+
+function resetRevenue(){
+ localStorage.removeItem("revenue");
+ loadRevenue();
+}
+
+loadRevenue();
+
+if ('serviceWorker' in navigator) {
+ window.addEventListener('load', ()=>{});
+}
+</script>
+
+<div class="card">
+<b>Add to Home Screen:</b><br>
+Safari → Chia sẻ → Thêm vào Màn hình chính.
+</div>
+</body>
+</html>
