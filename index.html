@@ -18,6 +18,12 @@ pre{white-space:pre-wrap}
 
 <div class="card">
 <h3>Chọn món nhanh</h3>
+ <input
+  type="text"
+  id="search"
+  placeholder="🔍 Tìm món..."
+  onkeyup="locMon()"
+/>
 <select id="mon"></select>
 <select id="size">
 <option>200</option>
@@ -193,6 +199,37 @@ function loadRevenue(){
 function resetRevenue(){
  localStorage.removeItem("revenue");
  loadRevenue();
+}
+ function locMon(){
+
+    const keyword =
+    document
+    .getElementById("search")
+    .value
+    .toLowerCase();
+
+    const select =
+    document.getElementById("mon");
+
+    select.innerHTML = "";
+
+    Object.keys(menu)
+    .filter(mon =>
+        mon.includes(keyword)
+    )
+    .sort()
+    .forEach(mon => {
+
+        const option =
+        document.createElement("option");
+
+        option.value = mon;
+        option.textContent = mon;
+
+        select.appendChild(option);
+
+    });
+
 }
 
 loadRevenue();
