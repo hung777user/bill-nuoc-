@@ -32,6 +32,7 @@ pre{white-space:pre-wrap}
 <h3>Hoặc nhập thủ công</h3>
 <textarea id="order" rows="8" placeholder="2 tao 300"></textarea>
 <button onclick="tinhTien()">🧾 Tính tiền</button>
+ <button onclick="donMoi()">🆕 Đơn mới</button>
 <input id="khachdua" type="number" placeholder="Tiền khách đưa (k)">
 </div>
 
@@ -78,6 +79,7 @@ function themMon(){
 }
 
 function tinhTien(){
+ 
  let lines=document.getElementById("order").value.trim().split("\n");
  let tong=0;
  let out="";
@@ -103,6 +105,19 @@ function tinhTien(){
  data[today]=(data[today]||0)+tong;
  localStorage.setItem("revenue",JSON.stringify(data));
  loadRevenue();
+}
+ function donMoi(){
+
+  if(confirm("Tạo đơn mới?")){
+
+      document.getElementById("order").value = "";
+
+      document.getElementById("bill").textContent = "";
+
+      document.getElementById("khachdua").value = "";
+
+  }
+
 }
 
 function loadRevenue(){
